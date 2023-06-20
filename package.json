@@ -1,0 +1,36 @@
+{
+  "name": "forkify_",
+  "version": "1.0.0",
+  "description": "Modern Web Application that manages multiple recipes.",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Wiran-Larbi/Forkify_.git"
+  },
+  "keywords": [
+    "MVC",
+    "ASYNC/AWAIT",
+    "Design",
+    "Patterns"
+  ],
+  "author": "DotCipher",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Wiran-Larbi/Forkify_/issues"
+  },
+  "homepage": "https://github.com/Wiran-Larbi/Forkify_#readme",
+  "devDependencies": {
+    "@parcel/transformer-image": "^2.0.0-rc.0",
+    "@parcel/transformer-sass": "^2.0.0-rc.0",
+    "parcel": "^2.0.0-rc.0"
+  },
+  "dependencies": {
+    "core-js": "^3.31.0",
+    "regenerator-runtime": "^0.13.11"
+  }
+}
