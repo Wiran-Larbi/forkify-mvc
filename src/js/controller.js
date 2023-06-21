@@ -1,159 +1,87 @@
-import RecipeDTO from "./Model/recipe";
-import icons from 'url:../img/icons.svg';
+import * as model from './Model/model.js';
+import recipeView from './View/recipe.js';
+import searchView from './View/search.js';
+import resultView from './View/result.js';
+import paginationView from './View/pagination.js';
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
+// if ( module.hot ) {
+//   module.hot.accept();
+// }
 
-const recipeContainer = document.querySelector('.recipe');
-
-const timeout = function (s) {
-  return new Promise(function (_, reject) {
-    setTimeout(function () {
-      reject(new Error(`Request took too long! Timeout after ${s} second`));
-    }, s * 1000);
-  });
-};
-
-// https://forkify-api.herokuapp.com/v2
-
-///////////////////////////////////////
-// console.log("Hello From Controller ..");
-
-const renderSpinner = function(parentEl) {
-  const markup = `
-    <div class="spinner">
-        <svg>
-          <use href="${icons}#icon-loader"></use>
-        </svg>
-    </div>
-  `;
-  parentEl.innerHTML = '';
-  parentEl.insertAdjacentHTML('afterbegin',markup);
-}
-
-const showRecipe = async function() {
-  try {
+      
+const controlRecipes = async function() {
+    try {
+    
     // * Getting the recipe hash
     const recipe_id = window.location.hash.slice(1);
     if(!recipe_id.length) return;
-    
+
     // * Rendering Spinner While the recipe data get loaded
-    renderSpinner(recipeContainer);
+    recipeView.renderSpinner();
 
-    // * Loading recipe data
+    // * Loading recipe
+    await model.loadRecipe(recipe_id);
+
+    const recipe = model.state.recipe;
     
-    const res = await fetch(`https://forkify-api.herokuapp.com/api/v2/recipes/${recipe_id}`, {
-      headers: {
-        'Cross-Origin-Resource-Policy': 'same-site'
-      }});
-    const data = await res.json();
-    if(!res.ok) throw new Error(`${data.message} (status : 404)`);
-    
-    // * Loading the recipe
-    const {id,title,publisher,source_url,image_url,servings,cooking_time,ingredients} = data.data.recipe;
-
-    let recipe = new RecipeDTO(id,title,publisher,source_url,image_url,servings,cooking_time,ingredients);
-
-
-    const ingredientsMarkup =  recipe.ingredients.map((ingredient) => {
-      return `<li class="recipe__ingredient">
-              <svg class="recipe__icon">
-                <use href="${icons}#icon-check"></use>
-              </svg>
-              <div class="recipe__quantity">${ingredient.quantity}</div>
-              <div class="recipe__description">
-                <span class="recipe__unit">${ingredient.unit}</span>
-                ${ingredient.description}
-              </div>
-              </li>`; 
-    }).join(''); 
-    
-
-    const RecipeMarkup =`
-    <figure class="recipe__fig">
-    <img src="${recipe.imageUrl}" crossOrigin="anonymous" alt="recipe image" class="recipe__img" />
-    <h1 class="recipe__title">
-      <span>${recipe.title}</span>
-    </h1>
-    </figure>
-
-  <div class="recipe__details">
-    <div class="recipe__info">
-      <svg class="recipe__info-icon">
-        <use href="${icons}#icon-clock"></use>
-      </svg>
-      <span class="recipe__info-data recipe__info-data--minutes">${recipe.cookingTime}</span>
-      <span class="recipe__info-text">minutes</span>
-    </div>
-    <div class="recipe__info">
-      <svg class="recipe__info-icon">
-        <use href="${icons}#icon-users"></use>
-      </svg>
-      <span class="recipe__info-data recipe__info-data--people">${recipe.servings}</span>
-      <span class="recipe__info-text">servings</span>
-      <div class="recipe__info-buttons">
-        <button class="btn--tiny btn--increase-servings">
-          <svg>
-            <use href="${icons}#icon-minus-circle"></use>
-          </svg>
-        </button>
-        <button class="btn--tiny btn--increase-servings">
-          <svg>
-            <use href="${icons}#icon-plus-circle"></use>
-          </svg>
-        </button>
-      </div>
-    </div>
-
-    <div class="recipe__user-generated">
-      <svg>
-        <use href="${icons}#icon-user"></use>
-      </svg>
-    </div>
-        <button class="btn--round">
-          <svg class="">
-            <use href="${icons}#icon-bookmark-fill"></use>
-          </svg>
-        </button>
-    </div>
-
-    <div class="recipe__ingredients">
-    <h2 class="heading--2">Recipe ingredients</h2>
-    <ul class="recipe__ingredient-list">
-      <!-- Here Where the infredients are inserted ! -->
-      ${ingredientsMarkup}
-    </ul>
-    </div>
-
-    <div class="recipe__directions">
-    <h2 class="heading--2">How to cook it</h2>
-    <p class="recipe__directions-text">
-      This recipe was carefully designed and tested by
-      <span class="recipe__publisher">${recipe.publisher}</span>. Please check out
-      directions at their website.
-    </p>
-    <a
-      class="btn--small recipe__btn"
-      href="${recipe.sourceUrl}"
-      target="_blank"
-    >
-      <span>Directions</span>
-      <svg class="search__icon">
-        <use href="${icons}#icon-arrow-right"></use>
-      </svg>
-    </a>
-  </div>
-    `;
-      // * Rendering the recipe
-      recipeContainer.innerHTML = '';
-      recipeContainer.insertAdjacentHTML("afterbegin",RecipeMarkup);
+    // * Rendering the Recipe after data loaded
+    recipeView.render(recipe);
 
     
   } catch (error) {
-      console.log(error);
+      recipeView.renderError();
   }
 }
 
-// ? Listening to hash changing
-const events = ["hashchange","load"];
-events.forEach(e => window.addEventListener(e,showRecipe));
+const controlSearchResult = async function() {
+  try {
+
+    // * Getting the search query
+    const query = searchView.getQuery();
+    if(!query) return;
+
+    // * Rendering Spinner While the search result data get loaded
+    resultView.renderSpinner();
+
+    // * Loading Search Results
+    await model.loadSearch(query);
+
+    // * Render Search Results
+    resultView.render(model.getSearchResultsPage(1));
+
+    // * Render the Pagination buttons
+    paginationView.render(model.state.search);
+
+    
+  } catch (error) {
+      resultView.renderError(error); 
+  }
+}
+
+const controlPagination = function (page) {
+   try {
+    // * Render New Search Results
+    resultView.render(model.getSearchResultsPage(page));
+
+    // * Render the New Pagination buttons
+    paginationView.render(model.state.search);
+
+   } catch (error) {
+    resultView.renderError(error); 
+   }
+
+    
+}
+
+
+const init = function() {
+  // ? Publisher - Subscriber Pattern
+  recipeView.renderSuccess();
+  recipeView.addHandlerRender(controlRecipes);
+  searchView.addHandlerSearch(controlSearchResult);
+  paginationView.addHandlerClick(controlPagination);
+}
+
+init();
