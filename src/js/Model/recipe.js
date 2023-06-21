@@ -1,17 +1,11 @@
+export class RecipeSearchDTO {
 
-export default class RecipeDTO {
-
-    constructor(id,title,publisher,sourceUrl,imageUrl,servings,cookingTime,ingredients) {
+    constructor(id,title,publisher,imageUrl) {
         this._id = id;
         this._title = title;
         this._publisher = publisher;
-        this._sourceUrl = sourceUrl;
         this._imageUrl = imageUrl;
-        this._servings = servings;
-        this._cookingTime = cookingTime;
-        this._ingredients = ingredients;
     }
-
     get id() {
         return this._id;
     }
@@ -32,19 +26,36 @@ export default class RecipeDTO {
     set publisher(publisher) {
         this._publisher = publisher;
     }
+    get imageUrl() {
+        return this._imageUrl;
+    }
+    set imageUrl(imageUrl) {
+        this._imageUrl = imageUrl;
+    }
+    toString() {
+        return `Recipe(
+            id: ${this._id},
+            title: ${this._title},
+            publisher: ${this._publisher},
+            imageUrl: ${this._imageUrl}
+        )`;
+    }
+}
+export class RecipeDTO extends RecipeSearchDTO {
+
+    constructor(id,title,publisher,imageUrl,sourceUrl,servings,cookingTime,ingredients) {
+        super(id,title,publisher,imageUrl);
+        this._sourceUrl = sourceUrl;
+        this._servings = servings;
+        this._cookingTime = cookingTime;
+        this._ingredients = ingredients;
+    }
 
     get sourceUrl() {
         return this._sourceUrl;
     }
     set sourceUrl(sourceUrl) {
         this._sourceUrl = sourceUrl;
-    }
-
-    get imageUrl() {
-        return this._imageUrl;
-    }
-    set imageUrl(imageUrl) {
-        this._imageUrl = imageUrl;
     }
 
     get servings() {

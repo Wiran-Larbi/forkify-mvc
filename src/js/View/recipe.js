@@ -1,69 +1,18 @@
 import icons from 'url:../../img/icons.svg';
 import { Fraction } from 'fractional';
+import View from './view.js';
 
-class RecipeView {
+class RecipeView extends View{
 
-    #parentElement = document.querySelector(".recipe");
-    #data;
-    #errorMessage = "Couldn't find Recipe ... 💭";
-    #successMessage = "Start by searching for a recipe or an ingredient. Have fun!";
+    _parentElement = document.querySelector(".recipe");
+    _errorMessage = "Couldn't find Recipe ... 💭";
+    _successMessage = "Start by searching for a recipe or an ingredient. Have fun!";
+    
+   
 
-
-    render(data) {
-       
-            this.#data = data;
-            const markup = this._generateMarkup("recipe");
-            this.#clear();
-            this.#parentElement.insertAdjacentHTML('afterbegin',markup);
-
-           
-    }
-    renderSpinner() {
-            const markup = this._generateMarkup("spinner");
-            this.#clear();
-            this.#parentElement.insertAdjacentHTML('afterbegin',markup);
-    }
-    renderError(message=this.#errorMessage) {
-          const markup = `<div class="error">
-                      <div>
-                        <svg>
-                          <use href="${icons}#icon-alert-triangle"></use>
-                        </svg>
-                      </div>
-                      <p>${message}</p>
-                      </div>`;
-          this.#clear();
-          this.#parentElement.insertAdjacentHTML('afterbegin',markup);
-    }
-    renderSuccess(message=this.#successMessage) {
-          const markup = `<div class="message">
-                      <div>
-                        <svg>
-                          <use href="${icons}#icon-smile"></use>
-                        </svg>
-                      </div>
-                      <p>${message}</p>
-                    </div>`;
-            this.#clear();
-            this.#parentElement.insertAdjacentHTML('afterbegin',markup);
-    }
-
-    _generateMarkup(type="recipe") {
-
-        if(type == "spinner") {
-            // ? Generating the spinner Markup
-            const markup = `
-            <div class="spinner">
-                <svg>
-                <use href="${icons}#icon-loader"></use>
-                </svg>
-                </div>
-                `;
-            return markup;
-
-        }else {
+    _generateMarkup() {
               // ? Generating the ingredients Markup
-              const ingredientsMarkup =  this.#data.ingredients.map((ingredient) => {
+              const ingredientsMarkup =  this._data.ingredients.map((ingredient) => {
                   return `<li class="recipe__ingredient">
                           <svg class="recipe__icon">
                             <use href="${icons}#icon-check"></use>
@@ -79,9 +28,9 @@ class RecipeView {
                     // ? Generating the recipe Markup
                     const RecipeMarkup =`
                     <figure class="recipe__fig">
-                    <img src="${this.#data.imageUrl}" crossOrigin="anonymous" alt="recipe image" class="recipe__img" />
+                    <img src="${this._data.imageUrl}" crossOrigin="anonymous" alt="recipe image" class="recipe__img" />
                     <h1 class="recipe__title">
-                      <span>${this.#data.title}</span>
+                      <span>${this._data.title}</span>
                     </h1>
                     </figure>
 
@@ -90,14 +39,14 @@ class RecipeView {
                       <svg class="recipe__info-icon">
                         <use href="${icons}#icon-clock"></use>
                       </svg>
-                      <span class="recipe__info-data recipe__info-data--minutes">${this.#data.cookingTime}</span>
+                      <span class="recipe__info-data recipe__info-data--minutes">${this._data.cookingTime}</span>
                       <span class="recipe__info-text">minutes</span>
                     </div>
                     <div class="recipe__info">
                       <svg class="recipe__info-icon">
                         <use href="${icons}#icon-users"></use>
                       </svg>
-                      <span class="recipe__info-data recipe__info-data--people">${this.#data.servings}</span>
+                      <span class="recipe__info-data recipe__info-data--people">${this._data.servings}</span>
                       <span class="recipe__info-text">servings</span>
                       <div class="recipe__info-buttons">
                         <button class="btn--tiny btn--increase-servings">
@@ -114,9 +63,11 @@ class RecipeView {
                     </div>
 
                     <div class="recipe__user-generated">
+                    <!--
                       <svg>
                         <use href="${icons}#icon-user"></use>
                       </svg>
+                      -->
                     </div>
                         <button class="btn--round">
                           <svg class="">
@@ -137,12 +88,12 @@ class RecipeView {
                     <h2 class="heading--2">How to cook it</h2>
                     <p class="recipe__directions-text">
                       This recipe was carefully designed and tested by
-                      <span class="recipe__publisher">${this.#data.publisher}</span>. Please check out
+                      <span class="recipe__publisher">${this._data.publisher}</span>. Please check out
                       directions at their website.
                     </p>
                     <a
                       class="btn--small recipe__btn"
-                      href="${this.#data.sourceUrl}"
+                      href="${this._data.sourceUrl}"
                       target="_blank"
                     >
                       <span>Directions</span>
@@ -153,8 +104,8 @@ class RecipeView {
                     </div>
                     `;
 
-                    return RecipeMarkup
-                            }
+                    return RecipeMarkup;
+      
     }
 
     addHandlerRender(handler) {
@@ -163,9 +114,7 @@ class RecipeView {
       events.forEach(e => window.addEventListener(e,handler));
     }
 
-    #clear() {
-       this.#parentElement.innerHTML = ''; 
-    }
+    
 }
 
 export default new RecipeView();
