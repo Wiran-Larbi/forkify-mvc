@@ -1,15 +1,9 @@
 import * as model from './Model/model.js';
+import recipe from './View/recipe.js';
 import recipeView from './View/recipe.js';
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
-const timeout = function (s) {
-  return new Promise(function (_, reject) {
-    setTimeout(function () {
-      reject(new Error(`Request took too long! Timeout after ${s} second`));
-    }, s * 1000);
-  });
-};
       
 const controlRecipes = async function() {
     try {
@@ -31,10 +25,14 @@ const controlRecipes = async function() {
 
     
   } catch (error) {
-      console.log(error);
+      recipeView.renderError();
   }
 }
 
-// ? Listening to hash changing
-const events = ["hashchange","load"];
-events.forEach(e => window.addEventListener(e,controlRecipes));
+const init = function() {
+  // ? Publisher - Subscriber Pattern
+  recipeView.renderSuccess();
+  recipeView.addHandlerRender(controlRecipes);
+}
+
+init();
