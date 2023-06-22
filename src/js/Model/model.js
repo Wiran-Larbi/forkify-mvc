@@ -22,6 +22,8 @@ export const loadRecipe = async function(recipeId) {
     // ? Mutating the state for later use of data
     state.recipe = recipe;
 
+    
+
     } catch (error) {
         throw error;
     }
@@ -53,4 +55,14 @@ export const getSearchResultsPage = function (page) {
         const endPage = page * RECIPE_PAGE;
 
         return state.search.result.slice(startPage,endPage);
+}
+
+export const updateServings = function (newServings) {
+        state.recipe.ingredients.forEach(ingredient => {
+            //  ? Formula : newQt = oldQt * newServings / oldServings   
+            ingredient.quantity = ingredient.quantity * newServings / state.recipe.servings;
+        });
+
+        // * Mutating the old servings in the state
+        state.recipe.servings = newServings;
 }

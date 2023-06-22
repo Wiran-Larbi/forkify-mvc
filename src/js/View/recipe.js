@@ -1,6 +1,7 @@
 import icons from 'url:../../img/icons.svg';
 import { Fraction } from 'fractional';
 import View from './view.js';
+import { MAX_SERVINGS,MIN_SERVINGS } from '../config.js';
 
 class RecipeView extends View{
 
@@ -49,12 +50,12 @@ class RecipeView extends View{
                       <span class="recipe__info-data recipe__info-data--people">${this._data.servings}</span>
                       <span class="recipe__info-text">servings</span>
                       <div class="recipe__info-buttons">
-                        <button class="btn--tiny btn--increase-servings">
+                        <button data-servings-to="${this._data.servings - 1}" class="btn--update-servings btn--tiny btn--increase-servings">
                           <svg>
                             <use href="${icons}#icon-minus-circle"></use>
                           </svg>
                         </button>
-                        <button class="btn--tiny btn--increase-servings">
+                        <button data-servings-to="${this._data.servings + 1}" class="btn--update-servings btn--tiny btn--increase-servings">
                           <svg>
                             <use href="${icons}#icon-plus-circle"></use>
                           </svg>
@@ -108,10 +109,24 @@ class RecipeView extends View{
       
     }
 
+    // ? Handling the render of the recipe
     addHandlerRender(handler) {
       // ? Listening to hash and load changing
       const events = ["hashchange","load"];
       events.forEach(e => window.addEventListener(e,handler));
+    }
+    // ? Handling the update of the servings
+    addHandlerUpdateServings(handler) {
+      // ? Listening to update buttons clicks
+      this._parentElement.addEventListener("click", function(e) {
+        const btn = e.target.closest(".btn--update-servings");
+        if(!btn) return;
+
+        const newServings = parseInt(btn.dataset.servingsTo);
+        if(newServings < MIN_SERVINGS || newServings > MAX_SERVINGS) return;
+
+        handler(newServings);
+      }); 
     }
 
     

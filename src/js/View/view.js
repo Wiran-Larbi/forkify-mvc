@@ -12,6 +12,35 @@ export default class View {
         this._clear();
         this._parentElement.insertAdjacentHTML('afterbegin',markup);
     }
+    // * Algorithm to Update only attributes and text values ~ Better than render method
+    update(data) {
+      this._data = data;
+      const newMarkup = this._generateMarkup();
+
+      // ? Converting a markup string to a dom elements
+      const VirtualDOM = document.createRange().createContextualFragment(newMarkup);
+      const VirtualElements = Array.from(VirtualDOM.querySelectorAll('*'));
+      const RealElements = Array.from(this._parentElement.querySelectorAll('*'));
+
+      // * Comparing the Virtual Elements w/ Real Elements
+      VirtualElements.forEach((virtEl,ind) => {
+          const realEl = RealElements[ind];
+          console.log(realEl,virtEl.isEqualNode(realEl));
+          
+          // * Changing the text content
+          if(!virtEl.isEqualNode(realEl) && virtEl.firstChild?.nodeValue.trim() !== '') {
+              realEl.textContent = virtEl.textContent;
+            }
+            // * Changing the attributes
+          if(!virtEl.isEqualNode(realEl)) {
+              Array.from(virtEl.attributes).forEach(attr => {
+                realEl.setAttribute(attr.name,attr.value);
+              })
+          } 
+      })
+      
+
+    }
     
     renderSpinner() {
             const markup = `<div class="spinner">
