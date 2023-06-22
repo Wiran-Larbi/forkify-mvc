@@ -2,7 +2,6 @@
   "name": "forkify_",
   "version": "1.0.0",
   "description": "Modern Web Application that manages multiple recipes.",
-  "main": "index.js",
   "scripts": {
     "start": "parcel index.html",
     "build": "parcel build index.html",
