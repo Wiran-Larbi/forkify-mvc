@@ -5,7 +5,19 @@ export class RecipeSearchDTO {
         this._title = title;
         this._publisher = publisher;
         this._imageUrl = imageUrl;
+        this._bookmarked = false;
     }
+
+    get isBookmarked(){
+        return this._bookmarked;
+    }
+    bookmark() {
+        this._bookmarked = true;
+    }
+    unbookmark() {
+        this._bookmarked = false;
+    }
+
     get id() {
         return this._id;
     }
@@ -49,6 +61,17 @@ export class RecipeDTO extends RecipeSearchDTO {
         this._servings = servings;
         this._cookingTime = cookingTime;
         this._ingredients = ingredients;
+        this._bookmarked = false;
+    }
+
+    get isBookmarked(){
+        return this._bookmarked;
+    }
+    bookmark() {
+        this._bookmarked = true;
+    }
+    unbookmark() {
+        this._bookmarked = false;
     }
 
     get sourceUrl() {
@@ -88,7 +111,7 @@ export class RecipeDTO extends RecipeSearchDTO {
             imageUrl: ${this._imageUrl},
             servings: ${this._servings},
             cookingTime: ${this._cookingTime},
-            ingredients: ${this._ingredients},
+            ingredients: ${this._ingredients.map((ingredient) => `Ingredient(quantity: ${ingredient.quantity},unit: ${ingredient.unit},description: ${ingredient.description})`).join(',')}
         )`;
     }
 

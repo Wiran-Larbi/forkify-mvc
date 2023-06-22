@@ -2,6 +2,7 @@ import * as model from './Model/model.js';
 import recipeView from './View/recipe.js';
 import searchView from './View/search.js';
 import resultView from './View/result.js';
+import bookmarkView from './View/bookmark.js';
 import paginationView from './View/pagination.js';
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
@@ -16,6 +17,9 @@ const controlRecipes = async function() {
     // * Getting the recipe hash
     const recipe_id = window.location.hash.slice(1);
     if(!recipe_id.length) return;
+
+     // * Rendering the Bookmarked Recipes
+     bookmarkView.render(model.state.bookmarks);
 
     // * Rendering Spinner While the recipe data get loaded
     recipeView.renderSpinner();
@@ -32,9 +36,12 @@ const controlRecipes = async function() {
     
     // * Rendering the Recipe after data loaded
     recipeView.render(recipe);
+
+   
     
   } catch (error) {
       recipeView.renderError(error.message);
+      console.error(error);
   }
 }
 
@@ -58,10 +65,9 @@ const controlSearchResult = async function() {
     paginationView.render(model.state.search);
 
     
-
-    
   } catch (error) {
       resultView.renderError(error); 
+      console.error(error);
   }
 }
 
@@ -75,6 +81,7 @@ const controlPagination = function (page) {
 
    } catch (error) {
     resultView.renderError(error); 
+    console.error(error);
    }
 }
 
@@ -90,18 +97,42 @@ const controlServings = function(newServings) {
       
     } catch (error) {
       recipeView.renderError(error);
+      console.error(error);
     }
+}
 
+const controlBookmark = function () {
+  try {
+    if(!model.state.recipe.isBookmarked){
+      // * Adding the bookmarked recipe to the state
+      model.addBookmark(model.state.recipe);
+    }else {
+      // * Deleting the bookmarked recipe from the state
+      model.deleteBookmark(model.state.recipe.id);
+    }
+    // * Updating the View 
+    recipeView.update(model.state.recipe); 
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+const controlAddedBookmarks = function() {
+    bookmarkView.render(model.state.bookmarks);
 }
 
 
 
 const init = function() {
   // ? Publisher - Subscriber Pattern
+  // * Bookmark View Handler
+  bookmarkView.addHandlerRender(controlAddedBookmarks);
+
   // * Recipe View Handlers
   recipeView.renderSuccess();
   recipeView.addHandlerRender(controlRecipes);
   recipeView.addHandlerUpdateServings(controlServings);
+  recipeView.addHandlerBookmark(controlBookmark);
 
   // * Search Result Handlers
   searchView.addHandlerSearch(controlSearchResult);

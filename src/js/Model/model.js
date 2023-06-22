@@ -1,12 +1,13 @@
 import { getJSON } from "../handler";
 import {RecipeDTO, RecipeSearchDTO} from "./recipe.js";
 import { RECIPE_PAGE,API_URL } from "../config";
+import bookmark from "../View/bookmark";
 
 
 export const state = {
     recipe: {},
     search: {},
-    bookmarks: {}
+    bookmarks: []
 }
 
 export const loadRecipe = async function(recipeId) {
@@ -22,7 +23,11 @@ export const loadRecipe = async function(recipeId) {
     // ? Mutating the state for later use of data
     state.recipe = recipe;
 
-    
+    // ? Checking if the loaded recipe already in the bookmarks
+    if(state.bookmarks?.some(bookmark => bookmark.id == recipe.id))
+        state.recipe.bookmark();
+    else
+        state.recipe.unbookmark();
 
     } catch (error) {
         throw error;
@@ -66,3 +71,58 @@ export const updateServings = function (newServings) {
         // * Mutating the old servings in the state
         state.recipe.servings = newServings;
 }
+
+const persistBookmarks = function() {
+
+    const filteredBookmarks = state.bookmarks.filter(obj => Object.keys(obj).length !== 0);
+    const bookmarksSTR = filteredBookmarks.map((bookmark) => {
+            return new RecipeSearchDTO(bookmark.id,bookmark.title,bookmark.publisher,bookmark.imageUrl);
+    });
+    
+    localStorage.setItem("bookmarks",JSON.stringify(bookmarksSTR));
+}
+
+const unpersistBookmarks = function() {
+    localStorage.clear();
+}
+
+export const addBookmark = function(recipe) {
+    if(!recipe || recipe == {}) return;
+    // Adding recipe to bookmarked
+    state.bookmarks.push(recipe);
+    
+    // Mark Current state recipe as bookmarked
+    state.recipe.bookmark();
+
+    // Persisting data to localStorage
+    persistBookmarks()
+}
+
+export const deleteBookmark = function(recipeId) {
+
+    // Deleting recipe from bookmarks
+    const indexOfDeletedRecipe = state.bookmarks.findIndex(recipe => recipe.id === recipeId);
+
+    state.bookmarks.splice(indexOfDeletedRecipe, 1);
+
+    // Mark Current state recipe as Un Bookmarked
+    if(recipeId === state.recipe.id) state.recipe.unbookmark();
+
+    // Persisting data to localStorage
+    persistBookmarks();
+}
+
+// ? We initially grab bookmarks, if exists from localStorage
+const init = function() {
+    const storage = localStorage.getItem("bookmarks");
+    if(storage){
+        const bookmarkObjects = JSON.parse(storage);
+        state.bookmarks = bookmarkObjects.map((bookmark) => {
+            return new RecipeSearchDTO(bookmark._id,bookmark._title,bookmark._publisher,bookmark._imageUrl);
+        });
+        state.bookmarks.forEach(bookmark => bookmark.bookmark());
+        console.log(state.bookmarks);
+    }
+}
+
+init();

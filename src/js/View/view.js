@@ -24,9 +24,7 @@ export default class View {
 
       // * Comparing the Virtual Elements w/ Real Elements
       VirtualElements.forEach((virtEl,ind) => {
-          const realEl = RealElements[ind];
-          console.log(realEl,virtEl.isEqualNode(realEl));
-          
+          const realEl = RealElements[ind];        
           // * Changing the text content
           if(!virtEl.isEqualNode(realEl) && virtEl.firstChild?.nodeValue.trim() !== '') {
               realEl.textContent = virtEl.textContent;
