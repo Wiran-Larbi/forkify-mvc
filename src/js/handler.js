@@ -19,9 +19,35 @@ export const getJSON = async (url) => {
           
           return data;
     } catch (error) {
-
         throw error;
         
     }
     
+}
+
+export const sendJSON = async (url,recipeData) => {
+
+  try {
+      const dataSTR = JSON.stringify(recipeData);
+      const fetchPro = fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: dataSTR
+      });
+
+      const res = await Promise.race([fetchPro,timeout(TIMEOUT_SEC)]);
+      const data = await res.json();
+      if(!res.ok) throw new Error(`${data.message} (status : ${res.status})`);
+      return data;
+    
+  } catch (error) {
+    throw error;
+    
+  }
+}
+
+export const UpdateURLId = function(newId) {
+      window.history.pushState(null, '', `#${newId}`);
 }

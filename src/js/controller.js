@@ -1,9 +1,13 @@
 import * as model from './Model/model.js';
+import { FORM_CLOSE_SEC } from './config.js';
+import { UpdateURLId } from './handler.js';
 import recipeView from './View/recipe.js';
 import searchView from './View/search.js';
 import resultView from './View/result.js';
 import bookmarkView from './View/bookmark.js';
 import paginationView from './View/pagination.js';
+import recipeFormView from './View/recipeForm.js';
+
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
@@ -121,6 +125,39 @@ const controlAddedBookmarks = function() {
     bookmarkView.render(model.state.bookmarks);
 }
 
+const controlRecipeFormData = async function(RecipeData) {
+  try {
+
+    // * Rendering the Spinner
+    recipeFormView.renderSpinner();
+
+    // * Uploading Recipe Data to API
+    await model.uploadRecipe(RecipeData);
+
+    // * Rendering Saved Recipe Data
+    recipeView.render(model.state.recipe); 
+
+    // * Closing the form Modal Window
+    setTimeout(function () {
+      recipeFormView._toggleForm();
+    },FORM_CLOSE_SEC * 1000);
+
+    // * Displaying the Success Message
+    recipeFormView.renderSuccess();
+
+    // * Rerender bookmarks View
+    bookmarkView.render(model.state.bookmarks);
+
+    // * Updating the ID of the URL
+    UpdateURLId(model.state.recipe.id);
+        
+  } catch (error) {
+    console.error('💭' + error);
+    recipeFormView.renderError(error.message);
+  }
+
+}
+
 
 
 const init = function() {
@@ -139,6 +176,9 @@ const init = function() {
   
   // * Pagination Handlers
   paginationView.addHandlerClick(controlPagination);
+
+  // * Recipe Form Handlers
+  recipeFormView._addHandlerRecipeUpload(controlRecipeFormData); 
 }
 
 init();

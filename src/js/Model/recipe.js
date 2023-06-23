@@ -6,8 +6,16 @@ export class RecipeSearchDTO {
         this._publisher = publisher;
         this._imageUrl = imageUrl;
         this._bookmarked = false;
+        this._key = null;
     }
 
+    hasKey() {
+        return this._key == null ? false : true;
+    }
+    addKey(key) {
+        if(key)
+            this._key = key;
+    }
     get isBookmarked(){
         return this._bookmarked;
     }
@@ -23,6 +31,10 @@ export class RecipeSearchDTO {
     }
     set id(id) {
         this._id = id;
+    }
+
+    get key() {
+        return this._key;
     }
 
     get title() {
@@ -62,6 +74,11 @@ export class RecipeDTO extends RecipeSearchDTO {
         this._cookingTime = cookingTime;
         this._ingredients = ingredients;
         this._bookmarked = false;
+        this._key = null;
+    }
+
+    hasKey() {
+        return this._key == null ? false : true;
     }
 
     get isBookmarked(){
